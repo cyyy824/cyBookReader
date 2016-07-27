@@ -80,6 +80,8 @@ BEGIN_MESSAGE_MAP(CcyBookReaderDlg, CDialogEx)
 	ON_WM_HSCROLL()
 	ON_BN_CLICKED(IDC_BUTTON_VS, &CcyBookReaderDlg::OnBnClickedButtonVs)
 	ON_WM_CLOSE()
+	ON_BN_CLICKED(IDC_BUTTON_BG, &CcyBookReaderDlg::OnBnClickedButtonBg)
+	ON_WM_LBUTTONDBLCLK()
 END_MESSAGE_MAP()
 
 
@@ -137,6 +139,7 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 			m_env.MoveFirst();
 		}
 	}
+	m_isShowDir = true;
 	//
 	// TODO: 在此添加额外的初始化代码
 	sf=0;
@@ -447,7 +450,15 @@ void CcyBookReaderDlg::ReSize(int cx, int cy)
 		m_rateSC.SetWindowPos(NULL,196,cy-40,cx-330,26, SWP_NOZORDER);
 		m_pageF.SetWindowPos(NULL,cx-135,cy-34,119,21,SWP_NOZORDER);
 
-		m_txReaderWnd.SetWindowPos(NULL,112,28,cx-112-119+20,cy-28-34-20-15,SWP_NOZORDER|SWP_NOMOVE);
+		if( m_isShowDir) 
+		{
+			m_txReaderWnd.SetWindowPos(NULL, 200, 47, cx - 112 - 119 + 20, cy - 28 - 34 - 20 - 15, SWP_NOZORDER);
+		}
+		else
+		{
+			m_txReaderWnd.SetWindowPos(NULL, 17, 47, cx - 112 - 119 + 20+183, cy - 28 - 34 - 20 - 15, SWP_NOZORDER);
+		}
+
 		m_txReaderWnd.ReDraw();
 		CString pnf;
 		pnf.Format(L"1/%d",m_txReaderWnd.GetPageNum());
@@ -578,3 +589,108 @@ void CcyBookReaderDlg::OnClose()
 
 	CDialogEx::OnClose();
 }
+
+
+void CcyBookReaderDlg::OnBnClickedButtonBg()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	/*
+	CFont *pFont = m_txReaderWnd.GetFont();
+	LOGFONT lf;
+	pFont->GetLogFont(&lf);
+	CFontDialog dlg(&lf, CF_EFFECTS | CF_SCREENFONTS, NULL, this);
+	dlg.m_cf.rgbColors = m_txReaderWnd.GetFontColor();
+	*/
+	COLORREF color = m_txReaderWnd.GetBGColor();
+	CColorDialog dlg;
+	dlg.m_cc.Flags |= CC_RGBINIT | CC_FULLOPEN;
+	if (IDOK == dlg.DoModal())
+	{
+		color = dlg.m_cc.rgbResult;
+		m_txReaderWnd.SetBgColor(color);
+		m_txReaderWnd.ReDraw();
+
+	}
+}
+
+
+void CcyBookReaderDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	CRect drc;
+	CRect crc;
+	m_dirLB.GetWindowRect(&drc);
+	ScreenToClient(&drc);
+	m_txReaderWnd.GetWindowRect(&crc);
+	ScreenToClient(&crc);
+	
+	CString str1, str2, str3;
+	str1.Format(L"dirRect:%d,%d,%d,%d\n", drc.top, drc.bottom, drc.left, drc.right);
+	str2.Format(L"contRect:%d,%d,%d,%d\n", crc.top, crc.bottom, crc.left, crc.right);
+	str3.Format(L"%d,%d\n", point.x, point.y);
+
+	OutputDebugString(str1);
+	OutputDebugString(str2);
+	OutputDebugString(str3);
+
+	if (m_isShowDir)
+	{
+		CRect trc;
+		trc.top = drc.top;
+		trc.bottom = drc.bottom;
+		trc.left = drc.right;
+		trc.right = crc.left;
+		if (trc.PtInRect(point))
+		{
+			HideDir();
+			
+		}
+	}
+	else
+	{
+		CRect trc;
+		trc.top = crc.top;
+		trc.bottom = crc.bottom;
+		trc.left = 0;
+		trc.right = crc.left;
+		if (trc.PtInRect(point))
+		{
+			ShowDir();
+			
+		}
+	}
+
+
+
+	CDialogEx::OnLButtonDblClk(nFlags, point);
+}
+
+void CcyBookReaderDlg::HideDir()
+{
+	CRect r1;
+	this->GetClientRect(&r1);
+	int cx = r1.Width();
+	int cy = r1.Height();
+	
+	if (!m_isShowDir)
+		return;
+
+	m_dirLB.ShowWindow(FALSE);
+	m_isShowDir = false;
+	ReSize(cx, cy);
+}
+
+void CcyBookReaderDlg::ShowDir()
+{
+	CRect r1;
+	this->GetClientRect(&r1);
+	int cx = r1.Width();
+	int cy = r1.Height();
+
+	if (m_isShowDir)
+		return;
+	m_dirLB.ShowWindow(TRUE);
+	m_isShowDir = true;
+	ReSize(cx, cy);
+}
+

@@ -39,12 +39,17 @@ protected:
 private:
 	void ReSize(int cx, int cy);
 
+private:
+	void HideDir();
+	void ShowDir();
+
 public:
 	CListBox m_dirLB;
 //	CTxtBookMark m_bm;
 	MBookMark* m_pBook;
 	CEnvDb m_env;
 	int sf;
+	bool m_isShowDir;
 	CTextReaderWnd m_txReaderWnd;
 
 	afx_msg void OnBnClickedButtonOpen();
@@ -61,4 +66,6 @@ public:
 
 	afx_msg void OnBnClickedButtonVs();
 	afx_msg void OnClose();
+	afx_msg void OnBnClickedButtonBg();
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 };

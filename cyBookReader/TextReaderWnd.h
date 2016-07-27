@@ -27,6 +27,8 @@ public:
 	void Init();
 	void ReDraw();
 
+	void SetBgColor(COLORREF color) { m_color = color; }
+	COLORREF GetBGColor() { return m_color; }
 	COLORREF GetFontColor(){return m_fontColor;}
 	void SetFontColor(COLORREF color){m_fontColor=color;}
 	
