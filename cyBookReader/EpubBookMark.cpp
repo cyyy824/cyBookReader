@@ -173,7 +173,7 @@ bool CEpubBookMark::ParseFromFile(std::wstring fileName)
 	return true;
 }
 
-bool CEpubBookMark::ParseFromString(wchar_t* buffer)
+bool CEpubBookMark::ParseFromString()
 {
 	return false;
 }

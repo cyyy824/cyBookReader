@@ -82,6 +82,7 @@ BEGIN_MESSAGE_MAP(CcyBookReaderDlg, CDialogEx)
 	ON_WM_CLOSE()
 	ON_BN_CLICKED(IDC_BUTTON_BG, &CcyBookReaderDlg::OnBnClickedButtonBg)
 	ON_WM_LBUTTONDBLCLK()
+	ON_BN_CLICKED(IDC_CHECK_DIR, &CcyBookReaderDlg::OnBnClickedCheckDir)
 END_MESSAGE_MAP()
 
 
@@ -129,6 +130,7 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 		m_env.m_fontH = 15;
 		m_env.m_color = RGB(255,255,255);
 		m_env.m_fontColor = RGB(0,0,0);
+		m_env.m_issplit = 0;
 		m_env.Update();
 	}
 	else
@@ -140,9 +142,22 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 		}
 	}
 	m_isShowDir = true;
+	((CButton*)GetDlgItem(IDC_CHECK_DIR))->SetCheck(m_env.m_issplit);
+	if (m_env.m_issplit)
+	{
+		ShowDir();
+	}
+	else
+	{
+		HideDir();
+	}
+	
 	//
 	// TODO: 在此添加额外的初始化代码
 	sf=0;
+	
+	m_txReaderWnd.SetFontColor(m_env.m_fontColor);
+	
 	CFont* myFont = new CFont;
 //	myFont->CreateFont(
     myFont->CreateFont( 
@@ -164,6 +179,8 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 	m_txReaderWnd.SetVS(m_env.m_vs);
 	myFont->Detach();
     delete myFont;
+
+	m_txReaderWnd.SetBgColor(m_env.m_color);
 
 	m_pageF.SetWindowText(L"");
 	m_txReaderWnd.Init();
@@ -283,8 +300,7 @@ void CcyBookReaderDlg::OnBnClickedButtonOpen()
 		if( m_pBook !=NULL) delete m_pBook;
 		m_pBook = new CEpubBookMark();
 	}
-	
-	
+	m_pBook->SetIsSplit(((CButton*)GetDlgItem(IDC_CHECK_DIR))->GetCheck());
 	m_pBook->ParseFromFile(fnstr);
 
 
@@ -578,8 +594,9 @@ void CcyBookReaderDlg::OnClose()
 		this->GetClientRect(&r1);
 		m_env.m_cx = r1.Width();
 		m_env.m_cy = r1.Height();
-		m_env.m_color = RGB(255,255,255);
+		m_env.m_color = m_txReaderWnd.GetBGColor();
 		m_env.m_fontColor = m_txReaderWnd.GetFontColor();
+		m_env.m_issplit = ((CButton*)GetDlgItem(IDC_CHECK_DIR))->GetCheck();
 
 //	m_TxtPage.
 		m_env.Update();
@@ -606,8 +623,8 @@ void CcyBookReaderDlg::OnBnClickedButtonBg()
 	dlg.m_cc.Flags |= CC_RGBINIT | CC_FULLOPEN;
 	if (IDOK == dlg.DoModal())
 	{
-		color = dlg.m_cc.rgbResult;
-		m_txReaderWnd.SetBgColor(color);
+		m_env.m_color = dlg.m_cc.rgbResult;
+		m_txReaderWnd.SetBgColor(m_env.m_color);
 		m_txReaderWnd.ReDraw();
 
 	}
@@ -694,3 +711,73 @@ void CcyBookReaderDlg::ShowDir()
 	ReSize(cx, cy);
 }
 
+
+
+void CcyBookReaderDlg::OnBnClickedCheckDir()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CRect r1;
+	this->GetClientRect(&r1);
+	int cx = r1.Width();
+	int cy = r1.Height();
+
+	int cs = ((CButton*)GetDlgItem(IDC_CHECK_DIR))->GetCheck();
+	
+	
+	if (((CButton*)GetDlgItem(IDC_CHECK_DIR))->GetCheck() == BST_CHECKED)
+	{
+		OutputDebugString(L"check");
+		ShowDir();
+		if (m_pBook == NULL) return;
+		if (m_pBook->SetIsSplit(true))
+		{
+			m_pBook->ParseFromString();
+			m_dirLB.ResetContent();
+			std::vector<std::wstring> snlist = m_pBook->GetAllSectionName();
+			for (std::vector<std::wstring>::iterator it = snlist.begin(); it != snlist.end(); it++)
+			{
+				m_dirLB.AddString(it->c_str());
+			}
+
+			int len1;
+			const wchar_t* pstr = m_pBook->GetSectionContent(0, len1);
+			m_txReaderWnd.SetText(pstr, len1);
+			m_txReaderWnd.ShowText(0);
+			m_rateSC.SetRange(0, m_txReaderWnd.GetPageNum() - 1);
+			TRACE(L"%d-%d", 0, m_txReaderWnd.GetPageNum());
+			m_rateSC.SetPos(0);
+			CString pnf;
+			pnf.Format(L"1/%d", m_txReaderWnd.GetPageNum());
+			m_pageF.SetWindowText(pnf);
+//			ReSize(cx, cy);
+		}
+	}
+	else
+	{
+		OutputDebugString(L"nocheck");
+		HideDir();
+		if (m_pBook == NULL) return;
+		if (m_pBook->SetIsSplit(false))
+		{
+			m_pBook->ParseFromString();
+			m_dirLB.ResetContent();
+			std::vector<std::wstring> snlist = m_pBook->GetAllSectionName();
+			for (std::vector<std::wstring>::iterator it = snlist.begin(); it != snlist.end(); it++)
+			{
+				m_dirLB.AddString(it->c_str());
+			}
+
+			int len1;
+			const wchar_t* pstr = m_pBook->GetSectionContent(0, len1);
+			m_txReaderWnd.SetText(pstr, len1);
+			m_txReaderWnd.ShowText(0);
+			m_rateSC.SetRange(0, m_txReaderWnd.GetPageNum() - 1);
+			TRACE(L"%d-%d", 0, m_txReaderWnd.GetPageNum());
+			m_rateSC.SetPos(0);
+			CString pnf;
+			pnf.Format(L"1/%d", m_txReaderWnd.GetPageNum());
+			m_pageF.SetWindowText(pnf);
+		}
+	}
+	
+}

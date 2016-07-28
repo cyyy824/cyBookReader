@@ -16,12 +16,13 @@ public:
 	std::vector<std::wstring> GetAllSectionName();
 	int GetSectionCount();//{return m_sectionList.size();}
 	bool ParseFromFile(std::wstring fileName);
-	bool ParseFromString(wchar_t* buffer);
+	bool ParseFromString();
 	std::wstring GetSectionName(int sectionNum);
 
 	const wchar_t* GetSectionContent(int sectionNum, int& length);
 
 	int GetPreGetBlock();//{return m_preGetBlock;}
+	bool SetIsSplit(bool isSplit) { return false; }
 private:
 	bool ParseContent();
 	bool ParseToc(char* buf,int length);

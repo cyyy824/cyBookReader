@@ -68,4 +68,5 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnBnClickedButtonBg();
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnBnClickedCheckDir();
 };

@@ -19,5 +19,6 @@ public:
     SQLiteString m_font;
 	int m_color;
 	int m_fontColor;
+	int m_issplit;
 };
 

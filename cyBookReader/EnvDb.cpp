@@ -11,6 +11,7 @@ CEnvDb::CEnvDb(void)
 	SetItem(4, "font",              MYDB_TYPE_TEXT, &m_font);
 	SetItem(5, "color",              MYDB_TYPE_INT, &m_color);
 	SetItem(6, "fontcolor",              MYDB_TYPE_INT, &m_fontColor);
+	SetItem(7, "issplit", MYDB_TYPE_INT, &m_issplit);
 }
 
 
@@ -21,7 +22,7 @@ CEnvDb::~CEnvDb(void)
 
 int CEnvDb::ItemCount()
 {
-	return 7;
+	return 8;
 }
 
 const char* CEnvDb::TableName() { return "envt"; }

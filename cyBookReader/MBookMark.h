@@ -28,11 +28,12 @@ public:	//–Ë÷ÿ‘ÿ∫Ø ˝
 	virtual std::vector<std::wstring> GetAllSectionName()=0;
 	virtual int GetSectionCount()=0;
 	virtual bool ParseFromFile(std::wstring fileName)=0;
-//	virtual bool ParseFromString(wchar_t* buffer)=0;
+	virtual bool ParseFromString()=0;
 	virtual std::wstring GetSectionName(int sectionNum)=0;
 
 	virtual const wchar_t* GetSectionContent(int sectionNum, int& length)=0;
 
 	virtual int GetPreGetBlock()=0;
+	virtual bool SetIsSplit(bool isSplit) = 0;
 };
 

@@ -12,6 +12,7 @@ CTxtBookMark::CTxtBookMark(void)
 	m_txtbuffer=NULL;
 	m_txtlen=0;
 	m_preGetBlock=0;
+	m_isSplit = false;
 }
 
 
@@ -90,7 +91,7 @@ bool CTxtBookMark::ParseFromFile(std::wstring fileName)
 	CFile s;
 
 	if(m_txtbuffer!=NULL)delete []m_txtbuffer;
-	m_sectionList.clear();
+	
 
 
 
@@ -141,138 +142,142 @@ bool CTxtBookMark::ParseFromFile(std::wstring fileName)
 		delete []pcBuffer;
 	}
 	m_txtlen=len;
-	return ParseFromString(m_txtbuffer);
+	return ParseFromString();
 }
-bool CTxtBookMark::ParseFromString(wchar_t* wbuffer)
+bool CTxtBookMark::ParseFromString()
 {
 	int startpos=0;
 	int endpos=0;
-
+	wchar_t* wbuffer = m_txtbuffer;
+	m_sectionList.clear();
 	if( m_txtbuffer==NULL) return false;
 	const wchar_t* pbuffer=m_txtbuffer;
 	int length = m_txtlen;
 
-	do{
-		int pos=0;
-		int posz=0;
-		int posj=0;
-		int poszk=0;
-		int posyk=0;
-		int posxzk=0;
-		int posxyk=0;
+	if (m_isSplit)
+	{
+		do {
+			int pos = 0;
+			int posz = 0;
+			int posj = 0;
+			int poszk = 0;
+			int posyk = 0;
+			int posxzk = 0;
+			int posxyk = 0;
 
-		int csn;
-		bool isFind = false;
-		//每行提取
-		
-		const wchar_t* pnext= wcschr(pbuffer,L'\n');
-		if( pnext == NULL) break;
-		int gl = pnext-pbuffer;
-		if( gl>50) gl=50;
-		
-		//章节检测
-		const wchar_t* pt1;
-		pt1 = wcsnchr(pbuffer,gl,L'第');
-		if( pt1==NULL) pos=-1;
-		pos=pt1-pbuffer;
-		
-		pt1 = wcsnchr(pbuffer,gl,L'章');
-		if( pt1==NULL) posz=-1;
-		posz=pt1-pbuffer;
-		
-		pt1 = wcsnchr(pbuffer,gl,L'节');
-		if( pt1==NULL) posj=-1;
-		posj=pt1-pbuffer;
-		
-		pt1 = wcsnchr(pbuffer,gl,L'（');
-		if( pt1==NULL) poszk=-1;
-		poszk=pt1-pbuffer;
-		
-		pt1 = wcsnchr(pbuffer,gl,L'）');
-		if( pt1==NULL) posyk=-1;
-		posyk=pt1-pbuffer;
-		
-		pt1 = wcsnchr(pbuffer,gl,L'(');
-		if( pt1==NULL) posxzk=-1;
-		posxzk=pt1-pbuffer;
-		
-		pt1 = wcsnchr(pbuffer,gl,L')');
-		if( pt1==NULL) posxyk=-1;
-		posxyk=pt1-pbuffer;
-		
-		if( pos>=0)
-		{
-			if( posz>0 && posz>pos )//第？章
+			int csn;
+			bool isFind = false;
+			//每行提取
+
+			const wchar_t* pnext = wcschr(pbuffer, L'\n');
+			if (pnext == NULL) break;
+			int gl = pnext - pbuffer;
+			if (gl > 50) gl = 50;
+
+			//章节检测
+			const wchar_t* pt1;
+			pt1 = wcsnchr(pbuffer, gl, L'第');
+			if (pt1 == NULL) pos = -1;
+			pos = pt1 - pbuffer;
+
+			pt1 = wcsnchr(pbuffer, gl, L'章');
+			if (pt1 == NULL) posz = -1;
+			posz = pt1 - pbuffer;
+
+			pt1 = wcsnchr(pbuffer, gl, L'节');
+			if (pt1 == NULL) posj = -1;
+			posj = pt1 - pbuffer;
+
+			pt1 = wcsnchr(pbuffer, gl, L'（');
+			if (pt1 == NULL) poszk = -1;
+			poszk = pt1 - pbuffer;
+
+			pt1 = wcsnchr(pbuffer, gl, L'）');
+			if (pt1 == NULL) posyk = -1;
+			posyk = pt1 - pbuffer;
+
+			pt1 = wcsnchr(pbuffer, gl, L'(');
+			if (pt1 == NULL) posxzk = -1;
+			posxzk = pt1 - pbuffer;
+
+			pt1 = wcsnchr(pbuffer, gl, L')');
+			if (pt1 == NULL) posxyk = -1;
+			posxyk = pt1 - pbuffer;
+
+			if (pos >= 0)
 			{
-				csn = ParseNum(pbuffer+pos+1,posz-pos-1);				
-				if(csn>=0)
-				{				
-					isFind = true;
-				}
-
-			}
-			//if( !isFind && posj>pos)//第？节
-			//{
-			//	csn = ParseNum(pbuffer+pos+1,posj-pos-1);				
-			//	if(csn>=0)
-			//	{				
-			//		isFind = true;
-			//	}
-			//}		
-		}
-		if (!isFind && poszk>=0) //（?）
-		{
-			if( posyk>poszk)
-			{
-
-				csn = ParseNum(pbuffer+poszk+1,posyk-poszk-1);				
-				if(csn>=0)
+				if (posz > 0 && posz > pos)//第？章
 				{
-					pos = poszk;
-					posz = posyk;
-					isFind = true;
+					csn = ParseNum(pbuffer + pos + 1, posz - pos - 1);
+					if (csn >= 0)
+					{
+						isFind = true;
+					}
+
 				}
+				//if( !isFind && posj>pos)//第？节
+				//{
+				//	csn = ParseNum(pbuffer+pos+1,posj-pos-1);
+				//	if(csn>=0)
+				//	{
+				//		isFind = true;
+				//	}
+				//}
 			}
-		}
-		if (!isFind && posxzk>=0) //(?)
-		{
-			if( posxyk>posxzk)
+			if (!isFind && poszk >= 0) //（?）
 			{
-
-				csn = ParseNum(pbuffer+posxzk+1,posxyk-posxzk-1);				
-				if(csn>=0)
+				if (posyk > poszk)
 				{
-					pos = posxzk;
-					posz = posxyk;
-					isFind = true;
+
+					csn = ParseNum(pbuffer + poszk + 1, posyk - poszk - 1);
+					if (csn >= 0)
+					{
+						pos = poszk;
+						posz = posyk;
+						isFind = true;
+					}
 				}
 			}
-		}
+			if (!isFind && posxzk >= 0) //(?)
+			{
+				if (posxyk > posxzk)
+				{
 
-		if( isFind )
-		{//(123)
-			wchar_t* pts = new wchar_t[gl];//[posz-pos+2];
-			wchar_t pts1[50];
-			wcsncpy(pts1,pbuffer,gl);//posz-pos+1);
-			pts1[gl-1]= L'\0';
-			wcsncpy(pts,pbuffer,gl);//posz-pos+1);
-			*(pts+gl-1) = L'\0';
-			std::wstring tempStr = pts;
+					csn = ParseNum(pbuffer + posxzk + 1, posxyk - posxzk - 1);
+					if (csn >= 0)
+					{
+						pos = posxzk;
+						posz = posxyk;
+						isFind = true;
+					}
+				}
+			}
 
-			SectionStruct node;
-			node.startpos=pbuffer-m_txtbuffer;
-	//		node.length= pnext-pbuffer;
-			tempStr=WTrim(tempStr);
-					
-			node.name = tempStr;
-			node.sectionnum = csn;
-			this->m_sectionList.push_back(node);
-		}
+			if (isFind)
+			{//(123)
+				wchar_t* pts = new wchar_t[gl];//[posz-pos+2];
+				wchar_t pts1[50];
+				wcsncpy(pts1, pbuffer, gl);//posz-pos+1);
+				pts1[gl - 1] = L'\0';
+				wcsncpy(pts, pbuffer, gl);//posz-pos+1);
+				*(pts + gl - 1) = L'\0';
+				std::wstring tempStr = pts;
+
+				SectionStruct node;
+				node.startpos = pbuffer - m_txtbuffer;
+				//		node.length= pnext-pbuffer;
+				tempStr = WTrim(tempStr);
+
+				node.name = tempStr;
+				node.sectionnum = csn;
+				this->m_sectionList.push_back(node);
+			}
 
 
-		pbuffer=pnext+1;
-	}while(pbuffer-m_txtbuffer<length);
-
+			pbuffer = pnext + 1;
+		} while (pbuffer - m_txtbuffer < length);
+	}
+	
 	ProcSectionList();
 
 	return true;
@@ -344,3 +349,4 @@ const wchar_t* CTxtBookMark::GetSectionContent(int sectionNum, int& length)
 	length = m_sectionList[sectionNum].length;
 	return m_txtbuffer+start;
 }
+
