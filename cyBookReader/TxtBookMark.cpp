@@ -129,14 +129,14 @@ bool CTxtBookMark::ParseFromFile(std::wstring fileName)
 	}
 	else if(len>3 && *(pcBuffer+0) == -17 && *(pcBuffer+1) == -69 && *(pcBuffer+2) == -65)
 	{//UTF-8
-		len = MultiByteToWideChar (CP_UTF8, 0, pcBuffer, -1, NULL, 0);
+		len = MultiByteToWideChar (CP_UTF8, 0, pcBuffer, len, NULL, 0);
 		m_txtbuffer = new wchar_t[len];
 		MultiByteToWideChar (CP_UTF8, 0, pcBuffer, -1, m_txtbuffer, len);// 开始转换
 		delete []pcBuffer;
 	}
 	else
 	{//ASCII
-		len = MultiByteToWideChar (CP_ACP, 0, pcBuffer, -1, NULL, 0);
+		len = MultiByteToWideChar (CP_ACP, 0, pcBuffer, len, NULL, 0);
 		m_txtbuffer = new wchar_t[len];
 		MultiByteToWideChar (CP_ACP, 0, pcBuffer, -1, m_txtbuffer, len);// 开始转换
 		delete []pcBuffer;

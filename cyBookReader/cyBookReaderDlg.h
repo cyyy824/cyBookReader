@@ -48,6 +48,7 @@ public:
 //	CTxtBookMark m_bm;
 	MBookMark* m_pBook;
 	CEnvDb m_env;
+	UINT OnSizeState;
 	int sf;
 	bool m_isShowDir;
 	CTextReaderWnd m_txReaderWnd;

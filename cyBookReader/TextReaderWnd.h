@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<vector>
+#include<map>
 // CTextReaderWnd
 
 
@@ -34,7 +35,8 @@ public:
 	
 private:
 	void split();
-
+	void split1();
+	LONG GetAscW(USHORT ch);
 
 public:
 	enum TShowMode
@@ -42,11 +44,18 @@ public:
 		EListMode,
 		EPageMode,
 	};
+	enum ELocType 
+	{
+		ELocNone=0,
+		ELocEnter,
+	};
 	struct STR_LOC
 	{
+		ELocType type;
 		int start;
 		int length;
 	};
+
 private:
 	int m_fontH;
 	int m_chiW;
@@ -54,6 +63,9 @@ private:
 	int m_pageNum;
 	int m_curPage;
 	int m_vs;//ÐÐ¾à
+	int m_preHeight;
+	int m_preFontH;
+	int m_preVs;
 	COLORREF m_color;
 	COLORREF m_fontColor;
 	CDC m_MemDC;
@@ -62,6 +74,7 @@ private:
 	const wchar_t* m_ptext;
 	int m_textLen;
 	std::vector<STR_LOC> m_slList;
+	std::map<char, LONG> m_ascMap;
 
 public:
 

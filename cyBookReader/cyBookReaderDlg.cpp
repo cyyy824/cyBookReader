@@ -126,6 +126,7 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 		m_env.m_cx = 0;
 		m_env.m_cy = 0;
 		m_env.m_vs = 0;
+		
 		m_env.m_font = "宋体";
 		m_env.m_fontH = 15;
 		m_env.m_color = RGB(255,255,255);
@@ -155,6 +156,7 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 	//
 	// TODO: 在此添加额外的初始化代码
 	sf=0;
+	OnSizeState = SIZE_RESTORED;
 	
 	m_txReaderWnd.SetFontColor(m_env.m_fontColor);
 	
@@ -313,6 +315,7 @@ void CcyBookReaderDlg::OnBnClickedButtonOpen()
 
 	int len1;
 	const wchar_t* pstr = m_pBook->GetSectionContent(0,len1);
+	m_txReaderWnd.ShowText(0);
 	m_txReaderWnd.SetText(pstr, len1);
 	m_txReaderWnd.ShowText(0);
 	m_rateSC.SetRange(0, m_txReaderWnd.GetPageNum()-1);
@@ -327,6 +330,13 @@ void CcyBookReaderDlg::OnBnClickedButtonOpen()
 void CcyBookReaderDlg::OnNcLButtonDown(UINT nHitTest, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	CRect r1;
+	this->GetClientRect(&r1);
+	int cx = r1.Width();
+	int cy = r1.Height();
+	CString ab;
+	ab.Format(_T("\n OnNcLButtonDown----left:%d,top=%d,w=%d,h=%d;px=%d,py=%d"), r1.left, r1.top, cx, cy,point.x,point.y);
+	OutputDebugString(ab);
 	sf=1;
 	CDialogEx::OnNcLButtonDown(nHitTest, point);
 }
@@ -335,6 +345,13 @@ void CcyBookReaderDlg::OnNcLButtonDown(UINT nHitTest, CPoint point)
 void CcyBookReaderDlg::OnNcLButtonUp(UINT nHitTest, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	CRect r1;
+	this->GetClientRect(&r1);
+	int cx = r1.Width();
+	int cy = r1.Height();
+	CString ab;
+	ab.Format(_T("\n OnNcLButtonUp----left:%d,top=%d,w=%d,h=%d;px=%d,py=%d"), r1.left, r1.top, cx, cy, point.x, point.y);
+	OutputDebugString(ab);
 	if( sf < 2)
 	{
 		sf = 0;
@@ -342,10 +359,7 @@ void CcyBookReaderDlg::OnNcLButtonUp(UINT nHitTest, CPoint point)
 	else
 	{
 		sf = 0;
-		CRect r1;
-		this->GetClientRect(&r1);
-		int cx = r1.Width();
-		int cy = r1.Height();
+
 		ReSize(cx,cy);
 	}
 	CDialogEx::OnNcLButtonUp(nHitTest, point);
@@ -356,16 +370,38 @@ void CcyBookReaderDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 
+	
+
+	CString ab;
+	ab.Format(_T("\nType:%d:x=%d,y=%d"), nType,cx,cy);
+	OutputDebugString(ab);
 	// TODO: 在此处添加消息处理程序代码
-	if(nType!=SIZE_MINIMIZED)  
+	if (nType == SIZE_RESTORED)
 	{
-		if (sf == 1 || sf==2)
+		if (OnSizeState == SIZE_MINIMIZED)
 		{
-			sf =2;
-			return;
+
 		}
-		ReSize(cx,cy);
+		else if (OnSizeState == SIZE_MAXIMIZED)
+		{
+			ReSize(cx, cy);
+		}
+		else if (sf == 1 || sf == 2)
+		{
+			sf = 2;
+		}
+		else
+		{
+			ReSize(cx, cy);
+		}
 	}
+	else if (nType == SIZE_MAXIMIZED)
+	{
+		sf = 0;
+		ReSize(cx, cy);
+	}
+
+	OnSizeState = nType;
 }
 
 
@@ -477,10 +513,12 @@ void CcyBookReaderDlg::ReSize(int cx, int cy)
 
 		m_txReaderWnd.ReDraw();
 		CString pnf;
-		pnf.Format(L"1/%d",m_txReaderWnd.GetPageNum());
+		int pn = m_txReaderWnd.GetPageNum();
+		int curp = m_txReaderWnd.GetCurPageNum();
+		pnf.Format(L"%d/%d",curp+1,pn);
 		m_pageF.SetWindowText(pnf);
-		m_rateSC.SetRange(0, m_txReaderWnd.GetPageNum()-1);
-		m_rateSC.SetPos(m_txReaderWnd.GetCurPageNum());
+		m_rateSC.SetRange(0, pn-1);
+		m_rateSC.SetPos(curp);
 
 	}
 }
@@ -505,7 +543,12 @@ void CcyBookReaderDlg::OnBnClickedButtonFont()
 			pFont->Detach();
 			delete pFont;
 
-			m_txReaderWnd.ReDraw();
+			CRect r1;
+			this->GetClientRect(&r1);
+			int cx = r1.Width();
+			int cy = r1.Height();
+			ReSize(cx, cy);
+		//	m_txReaderWnd.ReDraw();
 
         }
 }
@@ -572,7 +615,12 @@ void CcyBookReaderDlg::OnBnClickedButtonVs()
 	if(IDOK==vsdlg.DoModal())
 	{
 		m_txReaderWnd.SetVS(vsdlg.GetVS());
-		m_txReaderWnd.ReDraw();
+	//	m_txReaderWnd.ReDraw();
+		CRect r1;
+		this->GetClientRect(&r1);
+		int cx = r1.Width();
+		int cy = r1.Height();
+		ReSize(cx, cy);
 	}
 }
 
