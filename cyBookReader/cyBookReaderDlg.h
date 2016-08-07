@@ -9,6 +9,7 @@
 #include "EpubBookMark.h"
 #include "afxcmn.h"
 #include "EnvDb.h"
+#include "CyBookReaderConfig.h"
 
 // CcyBookReaderDlg ¶Ô»°¿ò
 class CcyBookReaderDlg : public CDialogEx
@@ -47,7 +48,9 @@ public:
 	CListBox m_dirLB;
 //	CTxtBookMark m_bm;
 	MBookMark* m_pBook;
-	CEnvDb m_env;
+
+	CcyBookReaderConfig m_config;
+
 	UINT OnSizeState;
 	int sf;
 	bool m_isShowDir;

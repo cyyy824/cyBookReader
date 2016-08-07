@@ -117,34 +117,14 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+	m_config.Read();
+
 	//
 	bool iss = false;
-	if( !m_env.Open("config.db"))
-	{
-		iss = m_env.Create("config.db");
-		m_env.AddNew();
-		m_env.m_cx = 0;
-		m_env.m_cy = 0;
-		m_env.m_vs = 0;
-		
-		m_env.m_font = "宋体";
-		m_env.m_fontH = 15;
-		m_env.m_color = RGB(255,255,255);
-		m_env.m_fontColor = RGB(0,0,0);
-		m_env.m_issplit = 0;
-		m_env.Update();
-	}
-	else
-	{
-		if( m_env.IsOpen())
-		{
-			int count = m_env.GetCount();
-			m_env.MoveFirst();
-		}
-	}
+
 	m_isShowDir = true;
-	((CButton*)GetDlgItem(IDC_CHECK_DIR))->SetCheck(m_env.m_issplit);
-	if (m_env.m_issplit)
+	((CButton*)GetDlgItem(IDC_CHECK_DIR))->SetCheck(m_config.m_issplit);
+	if (m_config.m_issplit)
 	{
 		ShowDir();
 	}
@@ -158,12 +138,12 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 	sf=0;
 	OnSizeState = SIZE_RESTORED;
 	
-	m_txReaderWnd.SetFontColor(m_env.m_fontColor);
+	m_txReaderWnd.SetFontColor(m_config.m_fontColor);
 	
 	CFont* myFont = new CFont;
 //	myFont->CreateFont(
     myFont->CreateFont( 
-		m_env.m_fontH,                                              //   nHeight 
+		m_config.m_fontH,                                              //   nHeight 
         0,                                                         //   nWidth 
         0,                                                         //   nEscapement 
         0,                                                         //   nOrientation 
@@ -176,13 +156,13 @@ BOOL CcyBookReaderDlg::OnInitDialog()
         CLIP_DEFAULT_PRECIS,               //   nClipPrecision 
         CLEARTYPE_QUALITY,                       //   nQuality 
         DEFAULT_PITCH   |   FF_SWISS,     //   nPitchAndFamily 
-		CString(m_env.m_font));
+		CString(m_config.m_font));
 	m_txReaderWnd.SetFont(myFont);
-	m_txReaderWnd.SetVS(m_env.m_vs);
+	m_txReaderWnd.SetVS(m_config.m_vs);
 	myFont->Detach();
     delete myFont;
 
-	m_txReaderWnd.SetBgColor(m_env.m_color);
+	m_txReaderWnd.SetBgColor(m_config.m_color);
 
 	m_pageF.SetWindowText(L"");
 	m_txReaderWnd.Init();
@@ -198,17 +178,17 @@ BOOL CcyBookReaderDlg::OnInitDialog()
 	m_rateSC.GetClientRect(&rect3);
 	m_pageF.GetClientRect(&rect4);
 	
-	if( m_env.m_cx >0 && m_env.m_cy >0)
+	if( m_config.m_cx >0 && m_config.m_cy >0)
 	 {
 	//	 ::Getcli
 		 int sw = ::GetSystemMetrics(SM_CXSCREEN);
 		 int sh = ::GetSystemMetrics(SM_CYSCREEN);
 		 CRect r1;
-		 r1.left = sw/2-m_env.m_cx/2;
-		 r1.top = sh/2-m_env.m_cy/2;
+		 r1.left = sw/2-m_config.m_cx/2;
+		 r1.top = sh/2-m_config.m_cy/2;
 	//	 r1.right = m_pSetting->m_cx;
 	//	 r1.bottom = m_pSetting->m_cy;
-		 this->SetWindowPos(NULL, r1.left,r1.top,m_env.m_cx,m_env.m_cy, SWP_SHOWWINDOW);
+		 this->SetWindowPos(NULL, r1.left,r1.top,m_config.m_cx,m_config.m_cy, SWP_SHOWWINDOW);
 	//	 this->ReSize(m_pSetting->m_cx, m_pSetting->m_cy);
 	//	this->GetClientRect(&r1);
 	//	this->SetWindowPos(NULL, r1.left, r1.
@@ -288,10 +268,10 @@ void CcyBookReaderDlg::OnBnClickedButtonOpen()
 	((CEdit*)GetDlgItem(IDC_EDIT_PATH))->SetWindowText(strFile);
 
 	
-	std::wstring fnstr = strFile.GetBuffer();
+	CString fnstr = strFile.GetBuffer();
 	
-	int a = fnstr.find(L".txt");
-	int b = fnstr.find(L".epub");
+	int a = fnstr.Find(L".txt");
+	int b = fnstr.Find(L".epub");
 	if( a > -1 )
 	{
 		if( m_pBook !=NULL) delete m_pBook;
@@ -307,10 +287,10 @@ void CcyBookReaderDlg::OnBnClickedButtonOpen()
 
 
 	m_dirLB.ResetContent();
-	std::vector<std::wstring> snlist = m_pBook->GetAllSectionName();
-	for(std::vector<std::wstring>::iterator it=snlist.begin();it!=snlist.end();it++)
+	std::vector<CString> snlist = m_pBook->GetAllSectionName();
+	for(std::vector<CString>::iterator it=snlist.begin();it!=snlist.end();it++)
 	{
-		m_dirLB.AddString( it->c_str());
+		m_dirLB.AddString( it->GetBuffer());
 	}
 
 	int len1;
@@ -452,6 +432,7 @@ void CcyBookReaderDlg::OnBnClickedButtonNext()
 		const wchar_t* pstr=m_pBook->GetSectionContent(cb+1,len1);
 		if( pstr!=NULL)
 		{
+		//	m_txReaderWnd.set
 			m_txReaderWnd.SetText(pstr,len1);
 			int pn = m_txReaderWnd.GetPageNum();
 
@@ -631,23 +612,21 @@ void CcyBookReaderDlg::OnClose()
 	CFont* pFont = m_txReaderWnd.GetFont();
 	LOGFONT logf;
 	pFont->GetLogFont(&logf);
+	
 
-	m_env.MoveFirst();
-	m_env.Edit();
-
-	m_env.m_fontH = logf.lfHeight;
-	m_env.m_font =  CStringA(logf.lfFaceName);
-	m_env.m_vs = m_txReaderWnd.GetVS();
+	m_config.m_fontH = logf.lfHeight;
+	m_config.m_font =  CStringA(logf.lfFaceName);
+	m_config.m_vs = m_txReaderWnd.GetVS();
 	CRect r1;
-		this->GetClientRect(&r1);
-		m_env.m_cx = r1.Width();
-		m_env.m_cy = r1.Height();
-		m_env.m_color = m_txReaderWnd.GetBGColor();
-		m_env.m_fontColor = m_txReaderWnd.GetFontColor();
-		m_env.m_issplit = ((CButton*)GetDlgItem(IDC_CHECK_DIR))->GetCheck();
+	this->GetClientRect(&r1);
+	m_config.m_cx = r1.Width();
+	m_config.m_cy = r1.Height();
+	m_config.m_color = m_txReaderWnd.GetBGColor();
+	m_config.m_fontColor = m_txReaderWnd.GetFontColor();
+	m_config.m_issplit = ((CButton*)GetDlgItem(IDC_CHECK_DIR))->GetCheck();
 
 //	m_TxtPage.
-		m_env.Update();
+	m_config.Update();
 
 
 
@@ -671,8 +650,8 @@ void CcyBookReaderDlg::OnBnClickedButtonBg()
 	dlg.m_cc.Flags |= CC_RGBINIT | CC_FULLOPEN;
 	if (IDOK == dlg.DoModal())
 	{
-		m_env.m_color = dlg.m_cc.rgbResult;
-		m_txReaderWnd.SetBgColor(m_env.m_color);
+		m_config.m_color = dlg.m_cc.rgbResult;
+		m_txReaderWnd.SetBgColor(m_config.m_color);
 		m_txReaderWnd.ReDraw();
 
 	}
@@ -689,15 +668,6 @@ void CcyBookReaderDlg::OnLButtonDblClk(UINT nFlags, CPoint point)
 	m_txReaderWnd.GetWindowRect(&crc);
 	ScreenToClient(&crc);
 	
-	CString str1, str2, str3;
-	str1.Format(L"dirRect:%d,%d,%d,%d\n", drc.top, drc.bottom, drc.left, drc.right);
-	str2.Format(L"contRect:%d,%d,%d,%d\n", crc.top, crc.bottom, crc.left, crc.right);
-	str3.Format(L"%d,%d\n", point.x, point.y);
-
-	OutputDebugString(str1);
-	OutputDebugString(str2);
-	OutputDebugString(str3);
-
 	if (m_isShowDir)
 	{
 		CRect trc;
@@ -781,10 +751,10 @@ void CcyBookReaderDlg::OnBnClickedCheckDir()
 		{
 			m_pBook->ParseFromString();
 			m_dirLB.ResetContent();
-			std::vector<std::wstring> snlist = m_pBook->GetAllSectionName();
-			for (std::vector<std::wstring>::iterator it = snlist.begin(); it != snlist.end(); it++)
+			std::vector<CString> snlist = m_pBook->GetAllSectionName();
+			for (std::vector<CString>::iterator it = snlist.begin(); it != snlist.end(); it++)
 			{
-				m_dirLB.AddString(it->c_str());
+				m_dirLB.AddString(it->GetBuffer());
 			}
 
 			int len1;
@@ -809,10 +779,10 @@ void CcyBookReaderDlg::OnBnClickedCheckDir()
 		{
 			m_pBook->ParseFromString();
 			m_dirLB.ResetContent();
-			std::vector<std::wstring> snlist = m_pBook->GetAllSectionName();
-			for (std::vector<std::wstring>::iterator it = snlist.begin(); it != snlist.end(); it++)
+			std::vector<CString> snlist = m_pBook->GetAllSectionName();
+			for (std::vector<CString>::iterator it = snlist.begin(); it != snlist.end(); it++)
 			{
-				m_dirLB.AddString(it->c_str());
+				m_dirLB.AddString(it->GetBuffer());
 			}
 
 			int len1;

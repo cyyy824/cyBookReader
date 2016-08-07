@@ -22,7 +22,6 @@
     <None Include="res\cyBookReader.ico">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="sqlite\sqlite3.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cyBookReader.h">
@@ -70,13 +69,7 @@
     <ClInclude Include="VSDialog.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="EnvDb.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLiteTbl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="sqlite\sqlite3.h">
+    <ClInclude Include="CyBookReaderConfig.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -126,10 +119,7 @@
     <ClCompile Include="VSDialog.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="EnvDb.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="SQLiteTbl.cpp">
+    <ClCompile Include="CyBookReaderConfig.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -139,6 +129,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="sqlite\sqlite3.lib" />
+    <Image Include="res\icon1.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="..\..\..\..\Downloads\favicon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\favicon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

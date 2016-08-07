@@ -12,11 +12,11 @@ public:
 	~CTxtBookMark(void);
 
 public:
-	std::vector<std::wstring> GetAllSectionName();
+	std::vector<CString> GetAllSectionName();
 	int GetSectionCount(){return m_sectionList.size();}
-	bool ParseFromFile(std::wstring fileName);
+	bool ParseFromFile(CString fileName);
 	bool ParseFromString();
-	std::wstring GetSectionName(int sectionNum);
+	CString GetSectionName(int sectionNum);
 
 	const wchar_t* GetSectionContent(int sectionNum, int& length);
 
@@ -30,7 +30,7 @@ private:
 private:
 	struct SectionStruct
 	{
-	std::wstring name;
+	CString name;
 	int sectionnum;
 	int startpos;
 	int length;

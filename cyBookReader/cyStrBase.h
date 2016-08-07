@@ -4,9 +4,9 @@
 
 
 
-int ParseNum(std::wstring str);
+int ParseNum(CString str);
 
-std::wstring WTrim(std::wstring str);
+CString WTrim(CString str);
 
 std::string Trim(std::string str);
 

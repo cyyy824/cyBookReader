@@ -20,9 +20,9 @@ CTxtBookMark::~CTxtBookMark(void)
 {
 	if( m_txtbuffer!=NULL) delete []m_txtbuffer;
 }
-std::vector<std::wstring> CTxtBookMark::GetAllSectionName()
+std::vector<CString> CTxtBookMark::GetAllSectionName()
 {
-	std::vector<std::wstring> reList;
+	std::vector<CString> reList;
 	for(std::vector<SectionStruct>::iterator it=m_sectionList.begin();it!=m_sectionList.end();++it)
 	{
 		reList.push_back(it->name);
@@ -83,7 +83,7 @@ int IsTextUTF8(char* str,ULONGLONG length)
 	return TRUE;
 }
 
-bool CTxtBookMark::ParseFromFile(std::wstring fileName)
+bool CTxtBookMark::ParseFromFile(CString fileName)
 {
 	char *pcBuffer;
 	ULONGLONG len;
@@ -95,7 +95,7 @@ bool CTxtBookMark::ParseFromFile(std::wstring fileName)
 
 
 
-	bool is = s.Open(fileName.c_str(), CFile::modeRead);
+	bool is = s.Open(fileName.GetBuffer(), CFile::modeRead);
 	if(!is) return false;
 	len = s.GetLength();
 	pcBuffer = new char[len+1];
@@ -261,7 +261,7 @@ bool CTxtBookMark::ParseFromString()
 				pts1[gl - 1] = L'\0';
 				wcsncpy(pts, pbuffer, gl);//posz-pos+1);
 				*(pts + gl - 1) = L'\0';
-				std::wstring tempStr = pts;
+				CString tempStr = pts;
 
 				SectionStruct node;
 				node.startpos = pbuffer - m_txtbuffer;
@@ -330,7 +330,7 @@ void CTxtBookMark::ProcSectionList()
 }
 
 
-std::wstring CTxtBookMark::GetSectionName(int sectionNum)
+CString CTxtBookMark::GetSectionName(int sectionNum)
 {
 	if( sectionNum<this->m_sectionList.size())
 	{

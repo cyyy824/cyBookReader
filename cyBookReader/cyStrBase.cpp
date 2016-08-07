@@ -84,9 +84,9 @@ int ParseNum(const wchar_t* pstr,int length)
 
 
 //解析数字
-int ParseNum(wstring str)
+int ParseNum(CString str)
 {
-	TRACE(str.c_str());
+	TRACE(str.GetBuffer());
 	int re=0;
 	if( str[0]>=L'0' && str[0]<=L'9')
 	{
@@ -95,14 +95,15 @@ int ParseNum(wstring str)
 		ss>>re;
 		return re;
 	}
-	wstring cnum[] = {L"零",L"一",L"二",L"三",L"四",L"五",L"六",L"七",L"八",L"九",L"十",L"百",L"千"};
+	CString cnum[] = {L"零",L"一",L"二",L"三",L"四",L"五",L"六",L"七",L"八",L"九",L"十",L"百",L"千"};
 	int tn=0;
 	int wn = 0;
 	int ss=0;
 	stack<int> stk;
-	while( ss<str.length())
+	while( ss<str.GetLength())
 	{
-		wstring sr = str.substr(ss,1);
+		CString sr = str.Mid(ss, 1);
+	//	wstring sr = str.substr(ss,1);
 		int i;
 		for(i=0;i<13;i++)
 		{
@@ -161,12 +162,12 @@ int ParseNum(wstring str)
 }
 
 //去空格
-wstring WTrim(wstring str)
+CString WTrim(CString str)
 {
 	wchar_t sg = L' ';
 	wchar_t sg1 = L'　';
 	int i;
-	for(i=0; i<str.length(); i++)
+	for(i=0; i<str.GetLength(); i++)
 	{
 		if( str[i]!=sg && str[i]!=sg1)
 		{
@@ -175,19 +176,20 @@ wstring WTrim(wstring str)
 	}
 	if(i>0)
 	{
-		str.erase(0,i);
+		str.Delete(0, i);
 	}
 
-	for(i=str.length()-1;i>=0;i--)
+	for(i=str.GetLength()-1;i>=0;i--)
 	{
 		if( str[i]!=sg && str[i]!=sg1)
 		{
 			break;
 		}
 	}
-	if(i<str.length()-1)
+	if(i<str.GetLength()-1)
 	{
-		str.erase(i);
+		str.Delete(i);
+
 	}
 	return str;
 }

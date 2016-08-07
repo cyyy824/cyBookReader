@@ -200,9 +200,8 @@ UpgradeLog*.htm
 # SQL Server files
 *.mdf
 *.ldf
-
-
 *.db
+
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout
@@ -236,3 +235,6 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+cyBookReader/
+*.db
+*.ini
