@@ -7,7 +7,7 @@ CcyBookReaderConfig::CcyBookReaderConfig()
 	m_cx=800;
 	m_cy=600;
 	m_fontH=14;
-	m_vs=0;//行距
+	m_vs=14;//行距
 	m_font = "宋体";
 	m_color= RGB(255,255,255);
 	m_fontColor= RGB(0,0,0);
@@ -28,6 +28,7 @@ bool CcyBookReaderConfig::Update(CString filename)
 	CString bcstr;
 	CString fstr;
 	CString splitstr;
+	CString vsstr;
 
 	wstr.Format(_T("%d"), m_cx);
 	hstr.Format(_T("%d"), m_cy);
@@ -36,10 +37,13 @@ bool CcyBookReaderConfig::Update(CString filename)
 	bcstr.Format(_T("%d,%d,%d"), GetRValue(m_color), GetGValue(m_color), GetBValue(m_color));
 	//	fstr.Format(_T("%d"), m_cx);
 	splitstr.Format(_T("%d"), m_issplit);
+	vsstr.Format(_T("%d"), m_vs);
 
 	WritePrivateProfileString(_T("Config"), _T("width"), wstr, filename);
 	WritePrivateProfileString(_T("Config"), _T("height"), hstr, filename);
 	WritePrivateProfileString(_T("Config"), _T("fontH"), fhstr, filename);
+	WritePrivateProfileString(_T("Config"), _T("rowspace"), vsstr, filename);
+	WritePrivateProfileString(_T("Config"), _T("split"), splitstr, filename);
 	WritePrivateProfileString(_T("Config"), _T("fontColor"), fcstr, filename);
 	WritePrivateProfileString(_T("Config"), _T("BGColor"), bcstr, filename);
 	WritePrivateProfileString(_T("Config"), _T("font"), m_font, filename);
@@ -63,6 +67,7 @@ bool CcyBookReaderConfig::Read(CString filename)
 	m_cx = GetPrivateProfileInt(_T("Config"), _T("width"), 0, filename);
 	m_cy = GetPrivateProfileInt(_T("Config"), _T("height"), 0, filename);
 	m_fontH = GetPrivateProfileInt(_T("Config"), _T("fontH"), 0, filename);
+	m_vs = GetPrivateProfileInt(_T("Config"), _T("rowspace"), 0, filename);
 	GetPrivateProfileString(_T("Config"), _T("fontColor"), _T("0"), fcstr.GetBuffer(14), 14, filename);
 	GetPrivateProfileString(_T("Config"), _T("BGColor"), _T("0"), bcstr.GetBuffer(14), 14, filename);
 	GetPrivateProfileString(_T("Config"), _T("font"), _T("宋体"), m_font.GetBuffer(20), 20, filename);

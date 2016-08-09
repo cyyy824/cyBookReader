@@ -25,6 +25,7 @@ public:
 	int GetCurPageNum(){return m_curPage;}
 	void SetVS(int vs){m_vs=vs;}
 	int GetVS(){return m_vs;}
+	int AutoSetVS();
 	void Init();
 	void ReDraw();
 

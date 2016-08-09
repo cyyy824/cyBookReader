@@ -21,7 +21,7 @@ public:
 	const wchar_t* GetSectionContent(int sectionNum, int& length);
 
 	int GetPreGetBlock(){return m_preGetBlock;}
-
+	void AutoSetVS();
 	bool SetIsSplit(bool isSplit) { m_isSplit = isSplit; return true; }
 
 private:

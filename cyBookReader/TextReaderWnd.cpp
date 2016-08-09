@@ -374,6 +374,12 @@ void CTextReaderWnd::ReDraw()
 	ShowText(this->m_curPage);
 }
 
+int CTextReaderWnd::AutoSetVS()
+{
+	this->m_vs = this->m_fontH;
+	return this->m_vs;
+}
+
 void  CTextReaderWnd::Init()
 {
 	CPaintDC dc(this);
@@ -391,6 +397,7 @@ void  CTextReaderWnd::Init()
 	m_pOldBitmap  = m_MemDC.SelectObject(&m_MemBitmap);
 	m_MemDC.SelectObject( this->GetFont());
 	m_MemDC.FillSolidRect(0,0,rect1.Width(),rect1.Height(),m_color);
+
 
 //	CSize s1 = m_MemDC.GetTextExtent(_T("f"));
 	CSize s2 = m_MemDC.GetTextExtent(_T("Íø"));

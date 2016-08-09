@@ -30,6 +30,8 @@ public:
 // 实现
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnNMClickSyslink1(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -42,6 +44,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+	ON_NOTIFY(NM_CLICK, IDC_SYSLINK1, &CAboutDlg::OnNMClickSyslink1)
 END_MESSAGE_MAP()
 
 
@@ -295,8 +298,9 @@ void CcyBookReaderDlg::OnBnClickedButtonOpen()
 
 	int len1;
 	const wchar_t* pstr = m_pBook->GetSectionContent(0,len1);
-	m_txReaderWnd.ShowText(0);
+//	m_txReaderWnd.ShowText(0);
 	m_txReaderWnd.SetText(pstr, len1);
+
 	m_txReaderWnd.ShowText(0);
 	m_rateSC.SetRange(0, m_txReaderWnd.GetPageNum()-1);
 	TRACE(L"%d-%d",0, m_txReaderWnd.GetPageNum());
@@ -521,6 +525,12 @@ void CcyBookReaderDlg::OnBnClickedButtonFont()
 			m_txReaderWnd.SetFontColor(dlg.m_cf.rgbColors);
 		//	font.CreateFontIndirectW(dlg.m_cf.lpLogFont);
 			m_txReaderWnd.SetFont(pFont);
+
+			if (dlg.m_cf.lpLogFont->lfHeight != m_config.m_vs)
+			{
+				m_config.m_fontH = dlg.m_cf.lpLogFont->lfHeight;
+				m_config.m_vs = m_txReaderWnd.AutoSetVS();
+			}
 			pFont->Detach();
 			delete pFont;
 
@@ -798,4 +808,18 @@ void CcyBookReaderDlg::OnBnClickedCheckDir()
 		}
 	}
 	
+}
+
+
+void CAboutDlg::OnNMClickSyslink1(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	// TODO: 在此添加控件通知处理程序代码
+	PNMLINK pNMLink = (PNMLINK)pNMHDR;
+//	if (wcscmp(pNMLink->item.szUrl, _T("http:\/\/weibo.com\/lisonglisong")) == 0)
+//	{
+		// 主要执行语句 
+		ShellExecuteW(NULL, L"open", pNMLink->item.szUrl, NULL, NULL, SW_SHOWNORMAL);
+//	}
+	*pResult = 0;
+
 }
