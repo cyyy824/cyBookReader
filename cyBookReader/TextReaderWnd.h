@@ -36,7 +36,8 @@ public:
 	
 private:
 	void split();
-	void split1();
+	void split(const wchar_t*pBuffer, int start,int length,int linew);
+	int SupplySpace(int PageLineNum);
 	LONG GetAscW(USHORT ch);
 
 public:
@@ -64,9 +65,7 @@ private:
 	int m_pageNum;
 	int m_curPage;
 	int m_vs;//ÐÐ¾à
-	int m_preHeight;
-	int m_preFontH;
-	int m_preVs;
+	int m_curStrCount;
 	COLORREF m_color;
 	COLORREF m_fontColor;
 	CDC m_MemDC;
