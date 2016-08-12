@@ -231,6 +231,7 @@ void CTextReaderWnd::SetText(const wchar_t* ptext,int length)
 	m_textLen = length;
 	m_ptext = ptext;
 	this->m_curPage = 0;
+	m_curStrCount = 0;
 	split();
 }
 
